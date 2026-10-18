@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>F.R.I.D.A.Y. Glassmorphism Assistant</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-blue: #0077ff;
+            --neon-gold: #ffaa00;
+            --neon-red: #ff2a54;
+            --neon-green: #00ff9d;
+            --glass-bg: rgba(6, 18, 38, 0.72);
+            --glass-border: rgba(0, 240, 255, 0.45);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: transparent !important;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+        }
+        /* Cửa sổ kính mờ Glassmorphism + Viền sáng Neon xanh Iron Man */
+        .friday-glass-modal {
+            width: 100%;
+            max-width: 410px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            border: 1.5px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px 18px;
+            box-shadow:
+                0 0 32px rgba(0, 240, 255, 0.35),
+                inset 0 0 24px rgba(0, 240, 255, 0.14),
+                0 16px 40px rgba(0, 0, 0, 0.75);
+            color: #e8f9ff;
+            position: relative;
+            animation: popIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.86) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.22);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+        .hud-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hud-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        .hud-title h2 {
+            font-size: 1.05rem;
+            letter-spacing: 2.5px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.75);
+            font-weight: 800;
+        }
+        .close-btn {
+            background: rgba(255, 42, 84, 0.18);
+            border: 1px solid rgba(255, 42, 84, 0.55);
+            color: #ff8da3;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Lò phản ứng Arc Reactor ở tâm */
+        .reactor-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 6px 0 12px;
+        }
+        .reactor-circle {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            border: 2.5px solid var(--neon-cyan);
+            background: radial-gradient(circle, rgba(0,240,255,0.35) 0%, rgba(0,20,45,0.85) 72%);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.55), inset 0 0 18px rgba(0, 240, 255, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .reactor-circle.listening {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 36px rgba(255, 42, 84, 0.9), inset 0 0 22px rgba(255, 42, 84, 0.7);
+            animation: reactorPulse 1s infinite;
+        }
+        .reactor-circle.speaking {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 36px rgba(255, 170, 0, 0.9), inset 0 0 22px rgba(255, 170, 0, 0.7);
+            animation: reactorPulse 0.8s infinite;
+        }
+        .reactor-ring {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(0, 240, 255, 0.75);
+            animation: spin 9s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes reactorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* Hiệu ứng Sóng âm (Voice Wave) Google Assistant / Iron Man */
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            height: 36px;
+            margin: 10px 0 4px;
+        }
+        .wave-bar {
+            width: 5px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+            transition: height 0.15s ease, background 0.2s ease;
+        }
+        .voice-wave.active .wave-bar {
+            animation: waveBounce 0.75s infinite ease-in-out;
+        }
+        .voice-wave.speaking .wave-bar {
+            background: var(--neon-gold);
+            box-shadow: 0 0 10px var(--neon-gold);
+            animation: waveBounce 0.6s infinite ease-in-out;
+        }
+        .voice-wave .wave-bar:nth-child(1) { animation-delay: 0.0s; }
+        .voice-wave .wave-bar:nth-child(2) { animation-delay: 0.12s; }
+        .voice-wave .wave-bar:nth-child(3) { animation-delay: 0.24s; }
+        .voice-wave .wave-bar:nth-child(4) { animation-delay: 0.36s; }
+        .voice-wave .wave-bar:nth-child(5) { animation-delay: 0.18s; }
+        .voice-wave .wave-bar:nth-child(6) { animation-delay: 0.30s; }
+        .voice-wave .wave-bar:nth-child(7) { animation-delay: 0.08s; }
+        @keyframes waveBounce {
+            0%, 100% { height: 7px; opacity: 0.55; }
+            50% { height: 32px; opacity: 1; }
+        }
+
+        .status-text {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+            min-height: 20px;
+            font-weight: 600;
+        }
+
+        /* Hộp hiển thị lời nói của User & câu trả lời của FRIDAY */
+        .dialogue-box {
+            background: rgba(2, 10, 24, 0.72);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 14px;
+            padding: 12px;
+            max-height: 155px;
+            overflow-y: auto;
+            font-size: 0.86rem;
+            line-height: 1.48;
+            margin-bottom: 12px;
+        }
+        .user-said {
+            color: #9be8ff;
+            font-style: italic;
+            margin-bottom: 6px;
+            font-size: 0.82rem;
+        }
+        .friday-reply {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* Thanh nhập lệnh nhanh & nút gửi */
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .cmd-input {
+            flex: 1;
+            background: rgba(2, 12, 28, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.38);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 0.86rem;
+            outline: none;
+        }
+        .send-btn {
+            background: linear-gradient(135deg, #00f0ff, #0077ff);
+            border: none;
+            color: #011124;
+            font-weight: 800;
+            padding: 0 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.84rem;
+        }
+        .server-bar {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #79a6c4;
+        }
+    </style>
+</head>
+<body>
+    <div class="friday-glass-modal">
+        <div class="hud-top">
+            <div class="hud-title">
+                <span class="hud-dot"></span>
+                <h2>F.R.I.D.A.Y. OVERLAY</h2>
+            </div>
+            <button class="close-btn" onclick="closeOverlayPanel()">✕</button>
+        </div>
+
+        <div class="reactor-zone">
+            <div class="reactor-circle" id="reactorBtn" onclick="triggerVoiceListen()">
+                <div class="reactor-ring"></div>
+                <span style="font-size: 1.75rem; z-index: 2;">🎙️</span>
+            </div>
+
+            <div class="voice-wave" id="voiceWave">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+
+            <div class="status-text" id="statusText">Bấm Lò phản ứng để nói với FRIDAY</div>
+        </div>
+
+        <div class="dialogue-box">
+            <div class="user-said" id="userSaid">🗣️ "Chào FRIDAY, kiểm tra tiến độ công việc giúp tôi..."</div>
+            <div class="friday-reply" id="fridayReply">Hệ thống đồng bộ đám mây đã sẵn sàng. Mời Sếp ra lệnh.</div>
+        </div>
+
+        <div class="input-row">
+            <input type="text" id="cmdInput" class="cmd-input" placeholder="Hoặc nhập lệnh cho FRIDAY..." />
+            <button class="send-btn" onclick="sendManualCommand()">GỬI</button>
+        </div>
+
+        <div class="server-bar">
+            <span id="serverUrlLabel">Cloudflare 4G Sync</span>
+            <span style="color:#00ff9d;">● Hands-Free Ready</span>
+        </div>
+    </div>
+
+    <script>
+        let SERVER_URL = "https://laundry-melbourne-personnel-sufficiently.trycloudflare.com";
+
+        // Được gọi từ Native Kotlin khi mở cửa sổ Overlay
+        function setServerUrlFromNative(url) {
+            if (url && url.trim().length > 0) {
+                SERVER_URL = url.trim().replace(/\/+$/, "");
+                document.getElementById('serverUrlLabel').innerText = SERVER_URL.replace("https://", "");
+            }
+        }
+
+        function setWaveState(mode) {
+            const reactor = document.getElementById('reactorBtn');
+            const wave = document.getElementById('voiceWave');
+            const status = document.getElementById('statusText');
+
+            reactor.classList.remove('listening', 'speaking');
+            wave.classList.remove('active', 'speaking');
+
+            if (mode === 'listening') {
+                reactor.classList.add('listening');
+                wave.classList.add('active');
+                status.innerText = "🎙️ FRIDAY đang lắng nghe giọng nói của Sếp...";
+            } else if (mode === 'speaking') {
+                reactor.classList.add('speaking');
+                wave.classList.add('speaking');
+                status.innerText = "🔊 FRIDAY đang phản hồi...";
+            } else if (mode === 'thinking') {
+                wave.classList.add('active');
+                status.innerText = "🧠 Đang đồng bộ với bộ não FRIDAY...";
+            } else {
+                status.innerText = "Bấm Lò phản ứng để tiếp tục nói";
+            }
+        }
+
+        // Bấm nút thu âm: ưu tiên gọi Native Android SpeechRecognizer qua JavascriptInterface,
+        // nếu chạy trên trình duyệt thường thì dùng Web Speech API
+        function triggerVoiceListen() {
+            if (window.AndroidBridge && window.AndroidBridge.startNativeVoiceRecognition) {
+                setWaveState('listening');
+                window.AndroidBridge.startNativeVoiceRecognition();
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                document.getElementById('statusText').innerText = "⚠️ Hãy nhập lệnh vào ô bên dưới";
+                return;
+            }
+            const rec = new SpeechRecognition();
+            rec.lang = 'vi-VN';
+            rec.onstart = () => setWaveState('listening');
+            rec.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                onVoiceResultFromNative(text);
+            };
+            rec.onerror = () => setWaveState('idle');
+            rec.onend = () => {};
+            rec.start();
+        }
+
+        // Được gọi khi nhận diện xong giọng nói (từ Native Android hoặc Web Speech API)
+        async function onVoiceResultFromNative(transcript) {
+            document.getElementById('userSaid').innerText = `🗣️ "${transcript}"`;
+            document.getElementById('cmdInput').value = transcript;
+            await dispatchToFridayServer(transcript);
+        }
+
+        async function sendManualCommand() {
+            const input = document.getElementById('cmdInput');
+            const text = input.value.trim();
+            if (!text) return;
+            document.getElementById('userSaid').innerText = `🗣️ "${text}"`;
+            input.value = '';
+            await dispatchToFridayServer(text);
+        }
+
+        async function dispatchToFridayServer(messageText) {
+            setWaveState('thinking');
+            try {
+                const response = await fetch(`${SERVER_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: messageText,
+                        device: 'Android Floating Overlay',
+                        speak_on_laptop: false
+                    })
+                });
+                const data = await response.json();
+                const reply = data.reply || "Đã nhận lệnh thưa Sếp.";
+                document.getElementById('fridayReply').innerText = reply;
+
+                setWaveState('speaking');
+                if (window.AndroidBridge && window.AndroidBridge.speakText) {
+                    window.AndroidBridge.speakText(reply);
+                } else if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(reply);
+                    u.lang = 'vi-VN';
+                    u.onend = () => setWaveState('idle');
+                    window.speechSynthesis.speak(u);
+                } else {
+                    setWaveState('idle');
+                }
+            } catch (err) {
+                document.getElementById('fridayReply').innerText = "❌ Không kết nối được tới Server: " + SERVER_URL;
+                setWaveState('idle');
+            }
+        }
+
+        function closeOverlayPanel() {
+            if (window.AndroidBridge && window.AndroidBridge.minimizeToBubble) {
+                window.AndroidBridge.minimizeToBubble();
+            }
+        }
+    </script>
+</body>
+</html>
